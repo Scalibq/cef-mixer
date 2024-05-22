@@ -148,7 +148,7 @@ public:
 
 	void render()
 	{
-		auto ctx = device_->immedidate_context();
+		auto ctx = device_->immediate_context();
 		if (!ctx || !swapchain_) {
 			return;
 		}

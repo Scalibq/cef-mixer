@@ -359,7 +359,7 @@ namespace d3d11 {
 		return "n/a";
 	}
 
-	shared_ptr<Context> Device::immedidate_context()
+	shared_ptr<Context> Device::immediate_context()
 	{
 		return ctx_;
 	}

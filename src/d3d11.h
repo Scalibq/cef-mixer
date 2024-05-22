@@ -58,7 +58,7 @@ namespace d3d11 {
 			return device_.get();
 		}
 
-		std::shared_ptr<Context> immedidate_context();
+		std::shared_ptr<Context> immediate_context();
 
 		std::shared_ptr<SwapChain> create_swapchain(HWND, int width=0, int height=0);
 		
