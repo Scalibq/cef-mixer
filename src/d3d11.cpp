@@ -202,18 +202,21 @@ namespace d3d11 {
 	
 	Texture2D::Texture2D(
 		ID3D11Texture2D* tex,
-		ID3D11ShaderResourceView* srv)
+		ID3D11ShaderResourceView* srv, HANDLE share_handle)
 		: texture_(to_com_ptr(tex))
 		, srv_(to_com_ptr(srv))
 	{
-		share_handle_ = nullptr;
-
-		IDXGIResource* res = nullptr;
-		if (SUCCEEDED(texture_->QueryInterface(
-			__uuidof(IDXGIResource), reinterpret_cast<void**>(&res))))
+		if (share_handle != nullptr)
+			share_handle_ = share_handle;
+		else
 		{
-			res->GetSharedHandle(&share_handle_);
-			res->Release();
+			IDXGIResource* res = nullptr;
+			if (SUCCEEDED(texture_->QueryInterface(
+				__uuidof(IDXGIResource), reinterpret_cast<void**>(&res))))
+			{
+				res->GetSharedHandle(&share_handle_);
+				res->Release();
+			}
 		}
 
 		// are we using a keyed mutex?
@@ -603,7 +606,7 @@ namespace d3d11 {
 			}
 		}
 		
-		return make_shared<Texture2D>(tex, srv);
+		return make_shared<Texture2D>(tex, srv, handle);
 	}
 
 	shared_ptr<Texture2D> Device::create_texture(

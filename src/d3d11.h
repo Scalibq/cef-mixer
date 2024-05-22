@@ -131,7 +131,8 @@ namespace d3d11 {
 	public:
 		Texture2D(
 			ID3D11Texture2D* tex,
-			ID3D11ShaderResourceView* srv);
+			ID3D11ShaderResourceView* srv,
+			HANDLE share_handle = nullptr);
 
 		void bind(std::shared_ptr<Context> const& ctx);
 		void unbind();
