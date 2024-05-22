@@ -145,7 +145,7 @@ public:
 			// notify the browser process that we want stats
 			auto message = CefProcessMessage::Create("mixer-request-stats");
 			if (message != nullptr && browser_ != nullptr) {
-				//browser_->SendProcessMessage(PID_BROWSER, message);
+				browser_->GetFocusedFrame()->SendProcessMessage(PID_BROWSER, message);
 			}
 			return true;
 		}
@@ -241,8 +241,9 @@ public:
 	// CefRenderProcessHandler::OnProcessMessageReceived
 	//
 	bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
+		CefRefPtr<CefFrame> frame,
 		CefProcessId /*source_process*/,
-		CefRefPtr<CefProcessMessage> message) 
+		CefRefPtr<CefProcessMessage> message) override
 	{
 		auto const name = message->GetName().ToString();
 		if (name == "mixer-update-stats")
@@ -484,8 +485,9 @@ public:
 
 	bool OnProcessMessageReceived(
 		CefRefPtr<CefBrowser> /*browser*/,
+		CefRefPtr<CefFrame> /*frame*/,
 		CefProcessId /*source_process*/,
-		CefRefPtr<CefProcessMessage> message) //override
+		CefRefPtr<CefProcessMessage> message) override
 	{
 		auto name = message->GetName().ToString();
 		if (name == "mixer-request-stats")
@@ -790,7 +792,7 @@ public:
 
 		args->SetDictionary(0, dict);
 
-		//browser->SendProcessMessage(PID_RENDERER, message);
+		browser->GetFocusedFrame()->SendProcessMessage(PID_RENDERER, message);
 	}
 
 	void resize(int width, int height)
