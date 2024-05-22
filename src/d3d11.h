@@ -50,11 +50,11 @@ namespace d3d11 {
 	class Device
 	{
 	public:
-		Device(ID3D11Device*, ID3D11DeviceContext*);
+		Device(ID3D11Device1*, ID3D11DeviceContext*);
 
 		std::string adapter_name() const;
 
-		operator ID3D11Device*() {
+		operator ID3D11Device1*() {
 			return device_.get();
 		}
 
@@ -72,7 +72,7 @@ namespace d3d11 {
 					const void* data,
 					size_t row_stride);
 
-		std::shared_ptr<Texture2D> open_shared_texture(void*);
+		std::shared_ptr<Texture2D> open_shared_texture(HANDLE);
 
 		std::shared_ptr<Effect> create_default_effect();
 
@@ -93,7 +93,7 @@ namespace d3d11 {
 
 		HMODULE _lib_compiler;
 
-		std::shared_ptr<ID3D11Device> const device_;
+		std::shared_ptr<ID3D11Device1> const device_;
 		std::shared_ptr<Context> const ctx_;
 	};
 
@@ -145,7 +145,7 @@ namespace d3d11 {
 		bool lock_key(uint64_t key, uint32_t timeout_ms);
 		void unlock_key(uint64_t key);
 
-		void* share_handle() const;
+		HANDLE share_handle() const;
 
 		void copy_from(std::shared_ptr<Texture2D> const&);
 		

@@ -280,7 +280,7 @@ namespace d3d11 {
 	{
 	}
 
-	void* Texture2D::share_handle() const
+	HANDLE Texture2D::share_handle() const
 	{
 		return share_handle_;
 	}
@@ -329,7 +329,7 @@ namespace d3d11 {
 		}
 	}
 
-	Device::Device(ID3D11Device* pdev, ID3D11DeviceContext* pctx)
+	Device::Device(ID3D11Device1* pdev, ID3D11DeviceContext* pctx)
 		: device_(to_com_ptr(pdev))
 		, ctx_(make_shared<Context>(pctx))
 	{
@@ -573,10 +573,10 @@ namespace d3d11 {
 		return nullptr;
 	}
 
-	shared_ptr<Texture2D> Device::open_shared_texture(void* handle)
+	shared_ptr<Texture2D> Device::open_shared_texture(HANDLE handle)
 	{
 		ID3D11Texture2D* tex = nullptr;
-		auto hr = device_->OpenSharedResource(
+		auto hr = device_->OpenSharedResource1(
 				handle, __uuidof(ID3D11Texture2D), (void**)(&tex));
 		if (FAILED(hr)) {
 			return nullptr;
@@ -839,6 +839,7 @@ float4 main(VS_OUTPUT input) : SV_Target
 
 		
 		ID3D11Device* pdev = nullptr;
+		ID3D11Device1* pdev1 = nullptr;
 		ID3D11DeviceContext* pctx = nullptr;
 
 		D3D_FEATURE_LEVEL selected_level;
@@ -872,7 +873,9 @@ float4 main(VS_OUTPUT input) : SV_Target
 		
 		if (SUCCEEDED(hr)) 
 		{
-			auto const dev = make_shared<Device>(pdev, pctx);
+			pdev->QueryInterface<ID3D11Device1>(&pdev1);
+
+			auto const dev = make_shared<Device>(pdev1, pctx);
 
 			log_message("d3d11: selected adapter: %s\n", dev->adapter_name().c_str());
 

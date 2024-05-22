@@ -145,7 +145,7 @@ public:
 			// notify the browser process that we want stats
 			auto message = CefProcessMessage::Create("mixer-request-stats");
 			if (message != nullptr && browser_ != nullptr) {
-				browser_->SendProcessMessage(PID_BROWSER, message);
+				//browser_->SendProcessMessage(PID_BROWSER, message);
 			}
 			return true;
 		}
@@ -322,7 +322,7 @@ public:
 	//
 	// called in response to Cef's OnAcceleratedPaint notification
 	//
-	void on_gpu_paint(void* shared_handle)
+	void on_gpu_paint(HANDLE shared_handle)
 	{
 		// Note: we're not handling keyed mutexes yet
 
@@ -339,7 +339,7 @@ public:
 		// open the shared texture
 		if (!shared_buffer_) 
 		{
-			shared_buffer_ = device_->open_shared_texture((void*)shared_handle);				
+			shared_buffer_ = device_->open_shared_texture(shared_handle);				
 			if (!shared_buffer_) {
 				log_message("could not open shared texture!");
 			}
@@ -485,7 +485,7 @@ public:
 	bool OnProcessMessageReceived(
 		CefRefPtr<CefBrowser> /*browser*/,
 		CefProcessId /*source_process*/,
-		CefRefPtr<CefProcessMessage> message) override
+		CefRefPtr<CefProcessMessage> message) //override
 	{
 		auto name = message->GetName().ToString();
 		if (name == "mixer-request-stats")
@@ -549,7 +549,7 @@ public:
 		CefRefPtr<CefBrowser> /*browser*/,
 		PaintElementType type,
 		const RectList& dirtyRects,
-		void* share_handle) override
+		const CefAcceleratedPaintInfo& info) override
 	{
 		if (type == PET_VIEW)
 		{
@@ -560,7 +560,7 @@ public:
 			}
 			
 			if (view_buffer_) {
-				view_buffer_->on_gpu_paint((void*)share_handle);
+				view_buffer_->on_gpu_paint(info.shared_texture_handle);
 			}
 			
 			if ((now - fps_start_) > 1000000)
@@ -582,7 +582,7 @@ public:
 			// metrics for the view
 
 			if (popup_buffer_) {
-				popup_buffer_->on_gpu_paint((void*)share_handle);
+				popup_buffer_->on_gpu_paint(info.shared_texture_handle);
 			}
 		}
 	}
@@ -671,6 +671,7 @@ public:
 		CefWindowInfo& window_info,
 		CefRefPtr<CefClient>& client,
 		CefBrowserSettings& settings,
+		CefRefPtr<CefDictionaryValue>& extra_info,
 		bool* no_javascript_access) override 
 	{
 		shared_ptr<Composition> composition;
@@ -705,6 +706,7 @@ public:
 			view,
 			target_url,
 			settings,
+			nullptr,
 			nullptr);
 
 		// create a new layer to handle drawing for the web popup
@@ -788,7 +790,7 @@ public:
 
 		args->SetDictionary(0, dict);
 
-		browser->SendProcessMessage(PID_RENDERER, message);
+		//browser->SendProcessMessage(PID_RENDERER, message);
 	}
 
 	void resize(int width, int height)
@@ -833,10 +835,10 @@ public:
 			CefWindowInfo windowInfo;
 			windowInfo.SetAsPopup(nullptr, "Developer Tools");
 			windowInfo.style = WS_VISIBLE | WS_OVERLAPPEDWINDOW;
-			windowInfo.x = 0;
-			windowInfo.y = 0;
-			windowInfo.width = 640;
-			windowInfo.height = 480;
+			windowInfo.bounds.x = 0;
+			windowInfo.bounds.y = 0;
+			windowInfo.bounds.width = 640;
+			windowInfo.bounds.height = 480;
 			browser->GetHost()->ShowDevTools(windowInfo, new DevToolsClient(), CefBrowserSettings(), { 0, 0 });
 		}
 	}
@@ -911,7 +913,7 @@ public:
 		std::shared_ptr<d3d11::Device> const& device,
 		bool want_input,
 		CefRefPtr<WebView> const& view)
-		: Layer(device, want_input, view->use_shared_textures())
+		: Layer(device, want_input, false/*view->use_shared_textures()*/)
 		, view_(view) {
 	}
 
@@ -1206,6 +1208,7 @@ shared_ptr<Layer> create_web_layer(
 			view, 
 			url, 
 			settings, 
+			nullptr,
 			nullptr);
 
 	return create_web_layer(device, want_input, view);
@@ -1226,7 +1229,7 @@ shared_ptr<Layer> create_popup_layer(
 //
 int cef_initialize(HINSTANCE instance)
 {
-	CefEnableHighDPISupport();
+	//CefEnableHighDPISupport();
 
 	{ // check first if we need to run as a worker process
 

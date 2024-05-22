@@ -405,7 +405,9 @@ int APIENTRY wWinMain(HINSTANCE instance, HINSTANCE, LPWSTR, int)
 
 	// default to webgl aquarium demo
 	if (url.empty()) {
-		url = "https://webglsamples.org/aquarium/aquarium.html";
+		//url = "https://webglsamples.org/aquarium/aquarium.html";
+		//url = "https://webglsamples.org/blob/blob.html";
+		url = "https://www.youtube.com/watch?v=7oAjnqu_wxE";
 	}
 	if (width <= 0) {
 		width = 1280;
