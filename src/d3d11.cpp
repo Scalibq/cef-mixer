@@ -875,9 +875,12 @@ float4 main(VS_OUTPUT input) : SV_Target
 		}
 		
 		if (SUCCEEDED(hr)) 
-		{
-			pdev->QueryInterface<ID3D11Device1>(&pdev1);
+			hr = pdev->QueryInterface<ID3D11Device1>(&pdev1);
 
+		pdev->Release();
+
+		if (SUCCEEDED(hr))
+		{
 			auto const dev = make_shared<Device>(pdev1, pctx);
 
 			log_message("d3d11: selected adapter: %s\n", dev->adapter_name().c_str());
