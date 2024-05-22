@@ -189,6 +189,7 @@ find_package(CEF REQUIRED)
 # we only bother with UNICODE builds on Windows
 if(MSVC)
 	add_definitions(-DUNICODE -D_UNICODE)
+	add_compile_options("/std:c++latest")
 endif()
 
 set(
