@@ -60,7 +60,7 @@ namespace d3d11 {
 
 		std::shared_ptr<Context> immediate_context();
 
-		std::shared_ptr<SwapChain> create_swapchain(HWND, int width=0, int height=0);
+		std::shared_ptr<SwapChain> create_swapchain(HWND, int width=0, int height=0, bool fullscreen=false);
 		
 		std::shared_ptr<Geometry> create_quad(
 					float x, float y, float width, float height, bool flip=false);

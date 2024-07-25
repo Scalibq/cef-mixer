@@ -9,6 +9,8 @@
 #include <fstream>
 #include <sstream>
 
+#define FULLSCREEN true
+
 //
 // if we're running on a system with hybrid graphics ... 
 // try to force the selection of the high-performance gpu
@@ -285,7 +287,7 @@ private:
 	void on_create()
 	{
 		// create a D3D11 swapchain for the window
-		swapchain_ = device_->create_swapchain(hwnd());
+		swapchain_ = device_->create_swapchain(hwnd(), 0, 0, FULLSCREEN);
 	}
 
 	void on_new_window()

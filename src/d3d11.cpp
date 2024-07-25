@@ -367,7 +367,7 @@ namespace d3d11 {
 		return ctx_;
 	}
 
-	shared_ptr<SwapChain> Device::create_swapchain(HWND window, int width, int height)
+	shared_ptr<SwapChain> Device::create_swapchain(HWND window, int width, int height, bool fullscreen)
 	{
 		HRESULT hr;
 		IDXGIFactory1* dxgi_factory = nullptr;
@@ -422,9 +422,17 @@ namespace d3d11 {
 			sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 			sd.BufferCount = 1;
 
+			DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsd = { 0 };
+			if (fullscreen)
+			{
+				fsd.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_PROGRESSIVE;
+				fsd.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+				fsd.Windowed = false;
+			}
+
 			IDXGISwapChain1* swapchain1 = nullptr;
 			hr = dxgi_factory2->CreateSwapChainForHwnd(
-							device_.get(), window, &sd, nullptr, nullptr, &swapchain1);
+							device_.get(), window, &sd, fullscreen ? &fsd : nullptr, nullptr, &swapchain1);
 			if (SUCCEEDED(hr))
 			{
 				hr = swapchain1->QueryInterface(__uuidof(IDXGISwapChain), reinterpret_cast<void**>(&swapchain));
@@ -448,7 +456,7 @@ namespace d3d11 {
 			sd.OutputWindow = window;
 			sd.SampleDesc.Count = 1;
 			sd.SampleDesc.Quality = 0;
-			sd.Windowed = TRUE;
+			sd.Windowed = !fullscreen;
 
 			hr = dxgi_factory->CreateSwapChain(device_.get(), &sd, &swapchain);
 		}
