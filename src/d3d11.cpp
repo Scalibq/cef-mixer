@@ -35,6 +35,9 @@ namespace d3d11 {
 		, swapchain_(to_com_ptr(swapchain))
 		, rtv_(to_com_ptr(rtv))
 	{
+		IDXGIOutput* pOutput = NULL;
+		swapchain_->GetContainingOutput(&pOutput);
+		output_ = shared_ptr<IDXGIOutput>(to_com_ptr(pOutput));
 	}
 
 	void SwapChain::bind(shared_ptr<Context> const& ctx)
@@ -76,6 +79,10 @@ namespace d3d11 {
 
 	void SwapChain::present(int sync_interval)
 	{
+		// Workaround for jerky animation when vsynced/fullscreen
+		if (sync_interval > 0)
+			output_->WaitForVBlank();
+
 		swapchain_->Present(sync_interval, 0);
 	}
 

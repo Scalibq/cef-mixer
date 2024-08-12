@@ -122,6 +122,7 @@ namespace d3d11 {
 		std::shared_ptr<ID3D11SamplerState> const sampler_;
 		std::shared_ptr<ID3D11BlendState> const blender_;
 		std::shared_ptr<IDXGISwapChain> const swapchain_;
+		std::shared_ptr<IDXGIOutput> output_;
 		std::shared_ptr<ID3D11RenderTargetView> rtv_;
 		std::shared_ptr<Context> ctx_;
 	};
